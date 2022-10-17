@@ -14,7 +14,7 @@ function App() {
           <Container maxWidth="sm">
             <p></p>
             <Stack spacing={5}>
-              <VisitorAPIComponents projectId="SAFFMG8aUTwNIZsXYgYg" handleCountryChange={(countryObj) => setCountry(countryObj)} handleStateChange={(stateObj) => setState(stateObj)}>
+              <VisitorAPIComponents projectId="" handleCountryChange={(countryObj) => setCountry(countryObj)} handleStateChange={(stateObj) => setState(stateObj)}>
                 <CountryField label="Country/Territory"></CountryField>
                 <StateField label="State/Province"></StateField>
               </VisitorAPIComponents>

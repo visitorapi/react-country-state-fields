@@ -6,11 +6,10 @@ The component package comes with a `<CountryField>` component and a `<StateField
 
 ![`<CountryField>` and `<StateField>` components](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-and-state-field.png)
 
-`<CountryField>` and `<StateField>` components
-
 ![`<CountryField>` component](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-options.png)
 
-`<CountryField>` component
+See a full working example here: [https://github.com/visitorapi/react-country-state-fields-example](https://github.com/visitorapi/react-country-state-fields-example)
+
 
 # Installation
 
