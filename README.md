@@ -1,70 +1,81 @@
-# Getting Started with Create React App
+# visitorapi-react-components
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The country and state fields are the most annoying fields to fill because of the long list of options. The VisitorAPI React components are designed to smooth the user experience by prefilling the fields based on the user’s IP location.
 
-## Available Scripts
+The component package comes with a `<CountryField>` component and a `<StateField>` component. The components are built with Material-UI as the screenshots are shown below.
 
-In the project directory, you can run:
+![`<CountryField>` and `<StateField>` components](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-and-state-field.png)
 
-### `npm start`
+`<CountryField>` and `<StateField>` components
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+![`<CountryField>` component](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-options.png)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+`<CountryField>` component
 
-### `npm test`
+# Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Run `npm i visitorapi-react-components` to install the components in your React project
 
-### `npm run build`
+# Setup a VisitorAPI project
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The components require a VisitorAPI project as the API endpoint to detect your React application users’ IP locations. Go to [VisitorAPI](https://www.visitorapi.com) to create a free plan or a paid-as-you-go plan, depending on the usage you expect. Once a project is created, you will see the project ID which will be needed to enable the auto-detecting feature of the field components.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Use the field components
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+First, you will need to import the `<VisitorAPIComponents>` component which is responsible for auto-detecting the user’s IP location and passing the country and field data back to your states. Then you can use the `<CountryField>` and `<StateField>` components to show the fields.
 
-### `npm run eject`
+```jsx
+import { CountryField, StateField, VisitorAPIComponents } from 'visitorapi-react-components';
+import React, { useState } from 'react';
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+export const MyForm = () => {
+	const [country, setCountry] = useState({}); // the selected country
+  const [state, setState] = useState({}); // the selected state
+  const visitorApiPrjectId = ""; // assign your project ID here
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  return(
+		<VisitorAPIComponents projectId={visitorApiPrjectId} handleCountryChange={(countryObj) => setCountry(countryObj)} handleStateChange={(stateObj) => setState(stateObj)}>
+      <CountryField label="Country/Territory"></CountryField>
+      <StateField label="State/Province"></StateField>
+    </VisitorAPIComponents>
+  );
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# `<VisitorAPIComponents>`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The `<VisitorAPIComponents>` component is invisible and you can put other form field components in it as children components. There are two purposes of the component:
 
-## Learn More
+1. Auto-detecting the user’s IP location and setting the default country and state objects
+2. Passing the country and state objects back through `handleCountryChange` and `handleStateChange` functions.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```jsx
+<VisitorAPIComponents projectId={visitorApiPrjectId} handleCountryChange={(countryObj) => setCountry(countryObj)} handleStateChange={(stateObj) => setState(stateObj)}>
+  // other field components here...
+  <CountryField label="Country/Territory"></CountryField>
+  <StateField label="State/Province"></StateField>
+  // other field and button components here...
+</VisitorAPIComponents>
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Props
 
-### Code Splitting
+- projectId - the [VisitorAPI](https://www.visitorapi.com) project ID from your VisitorAPI project. Without the project ID, your `<CountryField>` and `<StateField>` components will not be able to auto-detect users’ IP locations.
+- handleCountryChange - the function to handle changes in the `<CountryField>` component so that you can retrieve the selected country. The country object is a JSON in the format as `{code: "US", label: "United State"}`. You can use `.code` to get the country code or `.label` to get the country's full name.
+- handleStateChange - the function to handle changes in the `<StateField>` component so that you can retrieve the selected state. The state object is a JSON in the format as `{code: "CA", label: "California"}`. You can use `.code` to get the state code or `.label` to get the state's full name.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+# `<CountryField>`
 
-### Analyzing the Bundle Size
+The `<CountryField>` component is a selection field for users to input their countries. If auto-detection is enabled by giving a valid VisitorAPI project ID, the field will set the country automatically based on the user’s IP location.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Props
 
-### Making a Progressive Web App
+- label - the field label such as “Country/Territory”. Leave it blank if you have a separate component for the field’s label.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# `<StateField>`
 
-### Advanced Configuration
+The `<StateField>` component is a selection field for users to input their state if the states are specified in the `countries.json` file of the package, or it will show an open text field when the states are not defined in the JSON file. If auto-detection is enabled by giving a valid VisitorAPI project ID, the field will set the state automatically based on the user’s IP location.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Props
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- label - the field label such as “State/Province”. Leave it blank if you have a separate component for the field’s label.
