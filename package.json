@@ -1,12 +1,33 @@
 {
   "name": "react-country-state-fields",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "author": "VisitorAPI",
   "description": "React country and state field components that can auto-detect user's IP geolocation to prefill.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "files": ["dist","README.md","LICENSE"],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/visitorapi/react-country-state-fields.git"
+  },
+  "keywords": [
+    "react",
+    "country",
+    "state",
+    "form",
+    "field",
+    "component",
+    "ip",
+    "geolocation",
+    "location",
+    "reactjs"
+  ],
+  "bugs": {
+    "url": "https://github.com/visitorapi/react-country-state-fields/issues"
+  },
+  "homepage": "https://www.visitorapi.com",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@emotion/react": "^11.10.4",
