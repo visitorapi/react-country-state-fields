@@ -1,4 +1,4 @@
-# visitorapi-react-components
+# react-country-state-fields
 
 The country and state fields are the most annoying fields to fill because of the long list of options. The VisitorAPI React components are designed to smooth the user experience by prefilling the fields based on the user’s IP location.
 
@@ -14,7 +14,7 @@ The component package comes with a `<CountryField>` component and a `<StateField
 
 # Installation
 
-Run `npm i visitorapi-react-components` to install the components in your React project
+Run `npm i react-country-state-fields` to install the components in your React project
 
 # Setup a VisitorAPI project
 
@@ -25,7 +25,7 @@ The components require a VisitorAPI project as the API endpoint to detect your R
 First, you will need to import the `<VisitorAPIComponents>` component which is responsible for auto-detecting the user’s IP location and passing the country and field data back to your states. Then you can use the `<CountryField>` and `<StateField>` components to show the fields.
 
 ```jsx
-import { CountryField, StateField, VisitorAPIComponents } from 'visitorapi-react-components';
+import { CountryField, StateField, VisitorAPIComponents } from 'react-country-state-fields';
 import React, { useState } from 'react';
 
 export const MyForm = () => {
