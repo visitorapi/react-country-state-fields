@@ -1,8 +1,14 @@
 {
   "name": "react-country-state-fields",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
+  "author": "VisitorAPI",
+  "description": "React country and state field components that can auto-detect user's IP geolocation to prefill.",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": ["dist","README.md","LICENSE"],
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@mui/material": "^5.10.9",
@@ -17,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -38,5 +44,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.19.3",
+    "@babel/preset-env": "^7.19.4"
   }
 }
