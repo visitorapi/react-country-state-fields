@@ -29,12 +29,12 @@ import { CountryField, StateField, VisitorAPIComponents } from 'visitorapi-react
 import React, { useState } from 'react';
 
 export const MyForm = () => {
-	const [country, setCountry] = useState({}); // the selected country
+  const [country, setCountry] = useState({}); // the selected country
   const [state, setState] = useState({}); // the selected state
   const visitorApiPrjectId = ""; // assign your project ID here
 
   return(
-		<VisitorAPIComponents projectId={visitorApiPrjectId} handleCountryChange={(countryObj) => setCountry(countryObj)} handleStateChange={(stateObj) => setState(stateObj)}>
+    <VisitorAPIComponents projectId={visitorApiPrjectId} handleCountryChange={(countryObj) => setCountry(countryObj)} handleStateChange={(stateObj) => setState(stateObj)}>
       <CountryField label="Country/Territory"></CountryField>
       <StateField label="State/Province"></StateField>
     </VisitorAPIComponents>
