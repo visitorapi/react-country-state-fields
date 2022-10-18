@@ -8,7 +8,7 @@ The component package comes with a `<CountryField>` component and a `<StateField
 
 ![`<CountryField>` component](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-options.png)
 
-See the example repo, see here: [https://github.com/visitorapi/react-country-state-fields-example](https://github.com/visitorapi/react-country-state-fields-example)
+See here for the example repo: [https://github.com/visitorapi/react-country-state-fields-example](https://github.com/visitorapi/react-country-state-fields-example)
 
 
 # Installation
@@ -17,7 +17,9 @@ Run `npm i react-country-state-fields` to install the components in your React p
 
 # Setup a VisitorAPI project
 
-The components require a VisitorAPI project as the API endpoint to detect your React application users’ IP locations. Go to [VisitorAPI](https://www.visitorapi.com) to create a free plan or a paid-as-you-go plan, depending on the usage you expect. Once a project is created, you will see the project ID which will be needed to enable the auto-detecting feature of the field components.
+The components require a [VisitorAPI](https://www.visitorapi.com) project as the API endpoint to detect your React application users’ IP locations. Go to [VisitorAPI](https://www.visitorapi.com) to create a free plan or a paid-as-you-go plan, depending on the usage you expect. Once a project is created, you will see the project ID which will be needed to enable the auto-detecting feature of the field components.
+
+In the [VisitorAPI](https://www.visitorapi.com) project settings, you will also need to specify the domain names of your Reactjs application to authorise the API calls. VisitorAPI doesn't require any API key as an API designed for front-end use, instead, it uses the domain names to authorise the API calls so that it will be safe for you to call the APIs from the front-end.
 
 # Use the field components
 

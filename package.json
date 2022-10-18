@@ -1,6 +1,6 @@
 {
   "name": "react-country-state-fields",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": false,
   "author": "VisitorAPI",
   "description": "React country and state field components that can auto-detect user's IP geolocation to prefill.",
