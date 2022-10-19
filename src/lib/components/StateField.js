@@ -18,7 +18,11 @@ const StateField = ({label = "", }) => {
                 setValue(v);
             }
         }else{
-            setValue(null);
+            if(stateObj && stateObj.code){
+                setValue(stateObj);
+            }else{
+                setValue(null);
+            }
         }
     }, [countryObj, stateObj]);
 
@@ -58,6 +62,7 @@ const StateField = ({label = "", }) => {
                     inputProps={{
                         autoComplete: 'state',
                     }}
+                    value={(value===null)?"":value.code}
                     onChange={(event) => {
                         setStateObj({code: event.target.value, label: event.target.value});
                     }}

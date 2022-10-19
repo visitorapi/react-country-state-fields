@@ -43,13 +43,13 @@ export const VisitorAPIComponents = ({projectId, handleCountryChange, handleStat
                     return v
                 }
             }else{
-                return null
+                return {code: stateCode, label: stateCode}
             }
         }
 
         if(typeof(projectId) !== 'undefined' && projectId.trim() !== ''){
             api(projectId).then(data => {
-                const c = getCountryObj(data.countryCode);
+                const c = getCountryObj(data.countryCode)
                 setStateObj(getStateObj(c, data.region));
                 setCountryObj(c);
             }).catch(error => {
