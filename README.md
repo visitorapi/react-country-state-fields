@@ -4,6 +4,8 @@ The country and state fields are the most annoying fields to fill because of the
 
 The component package comes with a `<CountryField>` component and a `<StateField>` component. The components are built with Material-UI as the screenshots are shown below.
 
+![`React country and state fields](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/react-country-state-fields.gif)
+
 ![`<CountryField>` and `<StateField>` components](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-and-state-field.png)
 
 ![`<CountryField>` component](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-options.png)
