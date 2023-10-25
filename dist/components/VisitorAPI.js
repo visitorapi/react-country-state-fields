@@ -19,6 +19,8 @@ const VisitorAPIComponents = _ref => {
     projectId,
     handleCountryChange,
     handleStateChange,
+    defaultCountryCode,
+    defaultStateCode,
     children
   } = _ref;
   const [countryObj, setCountryObj] = (0, _react.useState)(null); // country object in the json file
@@ -58,19 +60,31 @@ const VisitorAPIComponents = _ref => {
           return v;
         }
       } else {
-        return null;
+        return {
+          code: stateCode,
+          label: stateCode
+        };
       }
     };
-    if (typeof projectId !== 'undefined' && projectId.trim() !== '') {
-      (0, _visitorapi.default)(projectId).then(data => {
-        const c = getCountryObj(data.countryCode);
-        setStateObj(getStateObj(c, data.region));
-        setCountryObj(c);
-      }).catch(error => {
-        // error, do nothing
-      });
+    if (defaultCountryCode) {
+      // use default values
+      const c = getCountryObj(defaultCountryCode);
+      setCountryObj(c);
+      if (defaultStateCode) {
+        setStateObj(getStateObj(c, defaultStateCode));
+      }
+    } else {
+      if (typeof projectId !== 'undefined' && projectId.trim() !== '') {
+        (0, _visitorapi.default)(projectId).then(data => {
+          const c = getCountryObj(data.countryCode);
+          setStateObj(getStateObj(c, data.region));
+          setCountryObj(c);
+        }).catch(error => {
+          // error, do nothing
+        });
+      }
     }
-  }, [projectId, countries]);
+  }, [projectId, countries, defaultCountryCode, defaultStateCode]);
   (0, _react.useEffect)(() => {
     handleCountryChange(countryObj);
   }, [countryObj, handleCountryChange]);

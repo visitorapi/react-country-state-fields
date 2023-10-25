@@ -4,7 +4,7 @@ import countryJson from "./countries.json";
 
 export const VisitorAPIContext = React.createContext();
 
-export const VisitorAPIComponents = ({projectId, handleCountryChange, handleStateChange, children}) => {
+export const VisitorAPIComponents = ({projectId, handleCountryChange, handleStateChange, defaultCountryCode, defaultStateCode, children}) => {
     const [countryObj, setCountryObj] = useState(null); // country object in the json file
     const [stateObj, setStateObj] = useState(null); // state object in the json file
     const countries = countryJson.countries;
@@ -47,16 +47,25 @@ export const VisitorAPIComponents = ({projectId, handleCountryChange, handleStat
             }
         }
 
-        if(typeof(projectId) !== 'undefined' && projectId.trim() !== ''){
-            api(projectId).then(data => {
-                const c = getCountryObj(data.countryCode)
-                setStateObj(getStateObj(c, data.region));
-                setCountryObj(c);
-            }).catch(error => {
-                // error, do nothing
-            })
+        if(defaultCountryCode){
+            // use default values
+            const c = getCountryObj(defaultCountryCode)
+            setCountryObj(c);
+            if(defaultStateCode){
+                setStateObj(getStateObj(c, defaultStateCode));
+            }
+        }else{
+            if(typeof(projectId) !== 'undefined' && projectId.trim() !== ''){
+                api(projectId).then(data => {
+                    const c = getCountryObj(data.countryCode)
+                    setStateObj(getStateObj(c, data.region));
+                    setCountryObj(c);
+                }).catch(error => {
+                    // error, do nothing
+                })
+            }    
         }
-    },[projectId, countries]);
+    },[projectId, countries, defaultCountryCode, defaultStateCode]);
 
     useEffect(() => {
         handleCountryChange(countryObj);

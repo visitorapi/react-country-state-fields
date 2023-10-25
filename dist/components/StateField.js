@@ -36,7 +36,11 @@ const StateField = _ref => {
         setValue(v);
       }
     } else {
-      setValue(null);
+      if (stateObj && stateObj.code) {
+        setValue(stateObj);
+      } else {
+        setValue(null);
+      }
     }
   }, [countryObj, stateObj]);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, countryObj && countryObj.states ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
@@ -63,6 +67,7 @@ const StateField = _ref => {
     inputProps: {
       autoComplete: 'state'
     },
+    value: value === null ? "" : value.code,
     onChange: event => {
       setStateObj({
         code: event.target.value,
