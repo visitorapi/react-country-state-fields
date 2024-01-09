@@ -1,12 +1,16 @@
 {
   "name": "react-country-state-fields",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": false,
   "author": "VisitorAPI",
   "description": "React country and state field components that can auto-detect user's IP geolocation to prefill.",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "files": ["dist","README.md","LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -30,10 +34,10 @@
   "homepage": "https://www.visitorapi.com",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "@mui/material": "^5.10.9",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.3",
+    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
@@ -67,8 +71,8 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.19.3",
-    "@babel/preset-env": "^7.19.4"
+    "@babel/cli": "^7.23.4",
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.8"
   }
 }
