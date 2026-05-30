@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Worktrees for isolated feature work — never tracked.
+.worktree/
