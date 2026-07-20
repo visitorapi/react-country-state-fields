@@ -43,6 +43,19 @@ export const getCitiesOfCountry = (countryCode) => {
 };
 
 /**
+ * Finds a city by name within a list of mapped city objects, case-insensitively.
+ * City names have no ISO code to normalize on (unlike country/state codes,
+ * which are uppercased consistently), and VisitorAPI's own geolocation data
+ * doesn't always match this dataset's casing exactly (e.g. "sydney" vs the
+ * canonical "Sydney"), so exact-match `===` comparisons silently fail here.
+ */
+export const findCityByName = (cities, cityName) => {
+    if (!cities || !cityName) return null;
+    const normalized = cityName.toLowerCase();
+    return cities.find((c) => c.label.toLowerCase() === normalized) || null;
+};
+
+/**
  * Returns the mapped country object with its states eagerly attached so
  * <StateField> can cascade without another lookup. For countries with no
  * states (e.g. Singapore, Monaco), cities are attached directly onto the

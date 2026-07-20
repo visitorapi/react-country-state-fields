@@ -63,7 +63,7 @@ const VisitorAPIComponents = _ref => {
         setStateObjState(s);
         if (defaultCityCode) {
           const cities = s && s.cities ? s.cities : [];
-          const matchedCity = cities.find(ct => ct.code === defaultCityCode);
+          const matchedCity = (0, _locationData.findCityByName)(cities, defaultCityCode);
           setCityObjState(matchedCity || {
             code: defaultCityCode,
             label: defaultCityCode
@@ -95,7 +95,9 @@ const VisitorAPIComponents = _ref => {
         return;
       }
       if (data.city) {
-        setCityObjState({
+        const cities = s && s.cities ? s.cities : [];
+        const matchedCity = (0, _locationData.findCityByName)(cities, data.city);
+        setCityObjState(matchedCity || {
           code: data.city,
           label: data.city
         });

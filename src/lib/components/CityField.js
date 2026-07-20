@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Autocomplete, TextField, Box } from "@mui/material";
+import { findCityByName } from "../data/locationData";
 import { VisitorAPIContext } from "./VisitorAPI";
 
 /**
@@ -31,8 +32,11 @@ const CityField = ({
 
     useEffect(() => {
         if (cities && cityObj && cityObj.code) {
-            const v = cities.find((obj) => obj.code === cityObj.code);
-            setValue(typeof v === 'undefined' ? null : v);
+            // Case-insensitive: VisitorAPI's own geolocation data doesn't
+            // always match this dataset's city-name casing exactly (e.g.
+            // "sydney" vs the canonical "Sydney").
+            const v = findCityByName(cities, cityObj.code);
+            setValue(v || null);
         } else if (cityObj && cityObj.code) {
             setValue(cityObj);
         } else {
@@ -52,6 +56,7 @@ const CityField = ({
                     fullWidth={fullWidth}
                     size={size}
                     getOptionLabel={(option) => option.label}
+                    isOptionEqualToValue={(option, val) => option.code === val.code}
                     renderOption={(props, option) => (
                         <Box component="li" {...props}>
                             {option.label}

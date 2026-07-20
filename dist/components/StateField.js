@@ -57,6 +57,7 @@ const StateField = _ref => {
     fullWidth: fullWidth,
     size: size,
     getOptionLabel: option => option.label,
+    isOptionEqualToValue: (option, val) => option.code === val.code,
     renderOption: (props, option) => /*#__PURE__*/_react.default.createElement(_material.Box, _extends({
       component: "li"
     }, props), option.label),

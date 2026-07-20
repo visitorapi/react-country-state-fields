@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getStatesOfCountry = exports.getStateByCodeAndCountry = exports.getCountryByCode = exports.getCitiesOfState = exports.getCitiesOfCountry = exports.getAllCountries = void 0;
+exports.getStatesOfCountry = exports.getStateByCodeAndCountry = exports.getCountryByCode = exports.getCitiesOfState = exports.getCitiesOfCountry = exports.getAllCountries = exports.findCityByName = void 0;
 var _countryStateCity = require("country-state-city");
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -51,12 +51,26 @@ const getCitiesOfCountry = countryCode => {
 };
 
 /**
+ * Finds a city by name within a list of mapped city objects, case-insensitively.
+ * City names have no ISO code to normalize on (unlike country/state codes,
+ * which are uppercased consistently), and VisitorAPI's own geolocation data
+ * doesn't always match this dataset's casing exactly (e.g. "sydney" vs the
+ * canonical "Sydney"), so exact-match `===` comparisons silently fail here.
+ */
+exports.getCitiesOfCountry = getCitiesOfCountry;
+const findCityByName = (cities, cityName) => {
+  if (!cities || !cityName) return null;
+  const normalized = cityName.toLowerCase();
+  return cities.find(c => c.label.toLowerCase() === normalized) || null;
+};
+
+/**
  * Returns the mapped country object with its states eagerly attached so
  * <StateField> can cascade without another lookup. For countries with no
  * states (e.g. Singapore, Monaco), cities are attached directly onto the
  * country instead, so <CityField> can still cascade from country alone.
  */
-exports.getCitiesOfCountry = getCitiesOfCountry;
+exports.findCityByName = findCityByName;
 const getCountryByCode = isoCode => {
   if (!isoCode) return null;
   const raw = _countryStateCity.Country.getCountryByCode(isoCode.toUpperCase());

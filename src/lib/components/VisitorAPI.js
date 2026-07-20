@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { default as api } from "visitorapi";
-import { getCountryByCode, getStateByCodeAndCountry } from "../data/locationData";
+import { getCountryByCode, getStateByCodeAndCountry, findCityByName } from "../data/locationData";
 
 export const VisitorAPIContext = React.createContext();
 
@@ -34,7 +34,7 @@ export const VisitorAPIComponents = ({
                 setStateObjState(s);
                 if (defaultCityCode) {
                     const cities = s && s.cities ? s.cities : [];
-                    const matchedCity = cities.find((ct) => ct.code === defaultCityCode);
+                    const matchedCity = findCityByName(cities, defaultCityCode);
                     setCityObjState(matchedCity || { code: defaultCityCode, label: defaultCityCode });
                 }
             }
@@ -67,7 +67,9 @@ export const VisitorAPIComponents = ({
                     return;
                 }
                 if (data.city) {
-                    setCityObjState({ code: data.city, label: data.city });
+                    const cities = s && s.cities ? s.cities : [];
+                    const matchedCity = findCityByName(cities, data.city);
+                    setCityObjState(matchedCity || { code: data.city, label: data.city });
                 }
             })
             .catch((err) => {

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _react = _interopRequireWildcard(require("react"));
 var _material = require("@mui/material");
+var _locationData = require("../data/locationData");
 var _VisitorAPI = require("./VisitorAPI");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -54,8 +55,11 @@ const CityField = _ref => {
   const cities = resolveCities(countryObj, stateObj);
   (0, _react.useEffect)(() => {
     if (cities && cityObj && cityObj.code) {
-      const v = cities.find(obj => obj.code === cityObj.code);
-      setValue(typeof v === 'undefined' ? null : v);
+      // Case-insensitive: VisitorAPI's own geolocation data doesn't
+      // always match this dataset's city-name casing exactly (e.g.
+      // "sydney" vs the canonical "Sydney").
+      const v = (0, _locationData.findCityByName)(cities, cityObj.code);
+      setValue(v || null);
     } else if (cityObj && cityObj.code) {
       setValue(cityObj);
     } else {
@@ -71,6 +75,7 @@ const CityField = _ref => {
     fullWidth: fullWidth,
     size: size,
     getOptionLabel: option => option.label,
+    isOptionEqualToValue: (option, val) => option.code === val.code,
     renderOption: (props, option) => /*#__PURE__*/_react.default.createElement(_material.Box, _extends({
       component: "li"
     }, props), option.label),

@@ -47,6 +47,7 @@ const CountryField = ({
             fullWidth={fullWidth}
             size={size}
             getOptionLabel={(option) => option.label}
+            isOptionEqualToValue={(option, val) => option.code === val.code}
             renderOption={(props, option) => (
                 <Box component="li" sx={showFlag ? { '& > img': { mr: 2, flexShrink: 0 } } : undefined} {...props}>
                     {showFlag && (renderFlag ? renderFlag(option) : defaultRenderFlag(option))}

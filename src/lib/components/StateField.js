@@ -37,6 +37,7 @@ const StateField = ({
                     fullWidth={fullWidth}
                     size={size}
                     getOptionLabel={(option) => option.label}
+                    isOptionEqualToValue={(option, val) => option.code === val.code}
                     renderOption={(props, option) => (
                         <Box component="li" {...props}>
                             {option.label}
