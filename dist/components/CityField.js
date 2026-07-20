@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _react = _interopRequireWildcard(require("react"));
 var _material = require("@mui/material");
-var _locationData = require("../data/locationData");
 var _VisitorAPI = require("./VisitorAPI");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -21,7 +20,21 @@ function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) 
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-const StateField = _ref => {
+/**
+ * Resolves which city list this field should offer, mirroring <StateField>'s
+ * cascade: prefer the selected state's cities; for countries with no states
+ * at all (e.g. Singapore, Monaco), fall back to the country's own city list.
+ */
+const resolveCities = (countryObj, stateObj) => {
+  if (stateObj && stateObj.cities) {
+    return stateObj.cities;
+  }
+  if (countryObj && !countryObj.states && countryObj.cities) {
+    return countryObj.cities;
+  }
+  return null;
+};
+const CityField = _ref => {
   let _ref$label = _ref.label,
     label = _ref$label === void 0 ? "" : _ref$label,
     sx = _ref.sx,
@@ -32,25 +45,26 @@ const StateField = _ref => {
   const _useContext = (0, _react.useContext)(_VisitorAPI.VisitorAPIContext),
     countryObj = _useContext.countryObj,
     stateObj = _useContext.stateObj,
-    setStateObj = _useContext.setStateObj,
+    cityObj = _useContext.cityObj,
     setCityObj = _useContext.setCityObj;
   const _useState = (0, _react.useState)(null),
     _useState2 = _slicedToArray(_useState, 2),
     value = _useState2[0],
     setValue = _useState2[1];
+  const cities = resolveCities(countryObj, stateObj);
   (0, _react.useEffect)(() => {
-    if (countryObj && countryObj.states && stateObj && stateObj.code) {
-      const v = countryObj.states.find(obj => obj.code === stateObj.code);
+    if (cities && cityObj && cityObj.code) {
+      const v = cities.find(obj => obj.code === cityObj.code);
       setValue(typeof v === 'undefined' ? null : v);
-    } else if (stateObj && stateObj.code) {
-      setValue(stateObj);
+    } else if (cityObj && cityObj.code) {
+      setValue(cityObj);
     } else {
       setValue(null);
     }
-  }, [countryObj, stateObj]);
-  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, countryObj && countryObj.states ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
+  }, [cities, cityObj]);
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, cities && cities.length > 0 ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
     value: value,
-    options: countryObj.states,
+    options: cities,
     autoHighlight: true,
     sx: sx,
     className: className,
@@ -64,16 +78,12 @@ const StateField = _ref => {
       label: label,
       variant: variant,
       inputProps: _objectSpread(_objectSpread({}, params.inputProps), {}, {
-        autoComplete: 'state'
+        autoComplete: 'address-level2'
       })
     })),
     onChange: (event, newValue) => {
       if (newValue) {
-        const enriched = countryObj ? (0, _locationData.getStateByCodeAndCountry)(newValue.code, countryObj.code) : newValue;
-        setStateObj(enriched || newValue);
-        if (setCityObj) {
-          setCityObj(null);
-        }
+        setCityObj(newValue);
       }
     }
   }) : /*#__PURE__*/_react.default.createElement(_material.TextField, {
@@ -84,18 +94,15 @@ const StateField = _ref => {
     fullWidth: fullWidth,
     size: size,
     inputProps: {
-      autoComplete: 'state'
+      autoComplete: 'address-level2'
     },
     value: value === null ? "" : value.code,
     onChange: event => {
-      setStateObj({
+      setCityObj({
         code: event.target.value,
         label: event.target.value
       });
-      if (setCityObj) {
-        setCityObj(null);
-      }
     }
   }));
 };
-var _default = exports.default = StateField;
+var _default = exports.default = CityField;

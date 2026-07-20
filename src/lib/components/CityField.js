@@ -1,9 +1,23 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Autocomplete, TextField, Box } from "@mui/material";
-import { getStateByCodeAndCountry } from "../data/locationData";
 import { VisitorAPIContext } from "./VisitorAPI";
 
-const StateField = ({
+/**
+ * Resolves which city list this field should offer, mirroring <StateField>'s
+ * cascade: prefer the selected state's cities; for countries with no states
+ * at all (e.g. Singapore, Monaco), fall back to the country's own city list.
+ */
+const resolveCities = (countryObj, stateObj) => {
+    if (stateObj && stateObj.cities) {
+        return stateObj.cities;
+    }
+    if (countryObj && !countryObj.states && countryObj.cities) {
+        return countryObj.cities;
+    }
+    return null;
+};
+
+const CityField = ({
     label = "",
     sx,
     className,
@@ -11,26 +25,27 @@ const StateField = ({
     fullWidth,
     size,
 }) => {
-    const { countryObj, stateObj, setStateObj, setCityObj } = useContext(VisitorAPIContext);
+    const { countryObj, stateObj, cityObj, setCityObj } = useContext(VisitorAPIContext);
     const [value, setValue] = useState(null);
+    const cities = resolveCities(countryObj, stateObj);
 
     useEffect(() => {
-        if (countryObj && countryObj.states && stateObj && stateObj.code) {
-            const v = countryObj.states.find((obj) => obj.code === stateObj.code);
+        if (cities && cityObj && cityObj.code) {
+            const v = cities.find((obj) => obj.code === cityObj.code);
             setValue(typeof v === 'undefined' ? null : v);
-        } else if (stateObj && stateObj.code) {
-            setValue(stateObj);
+        } else if (cityObj && cityObj.code) {
+            setValue(cityObj);
         } else {
             setValue(null);
         }
-    }, [countryObj, stateObj]);
+    }, [cities, cityObj]);
 
     return (
         <>
-            {(countryObj && countryObj.states) ? (
+            {(cities && cities.length > 0) ? (
                 <Autocomplete
                     value={value}
-                    options={countryObj.states}
+                    options={cities}
                     autoHighlight
                     sx={sx}
                     className={className}
@@ -49,19 +64,13 @@ const StateField = ({
                             variant={variant}
                             inputProps={{
                                 ...params.inputProps,
-                                autoComplete: 'state',
+                                autoComplete: 'address-level2',
                             }}
                         />
                     )}
                     onChange={(event, newValue) => {
                         if (newValue) {
-                            const enriched = countryObj
-                                ? getStateByCodeAndCountry(newValue.code, countryObj.code)
-                                : newValue;
-                            setStateObj(enriched || newValue);
-                            if (setCityObj) {
-                                setCityObj(null);
-                            }
+                            setCityObj(newValue);
                         }
                     }}
                 />
@@ -74,14 +83,11 @@ const StateField = ({
                     fullWidth={fullWidth}
                     size={size}
                     inputProps={{
-                        autoComplete: 'state',
+                        autoComplete: 'address-level2',
                     }}
                     value={(value === null) ? "" : value.code}
                     onChange={(event) => {
-                        setStateObj({ code: event.target.value, label: event.target.value });
-                        if (setCityObj) {
-                            setCityObj(null);
-                        }
+                        setCityObj({ code: event.target.value, label: event.target.value });
                     }}
                 />
             )}
@@ -89,4 +95,4 @@ const StateField = ({
     );
 };
 
-export default StateField;
+export default CityField;

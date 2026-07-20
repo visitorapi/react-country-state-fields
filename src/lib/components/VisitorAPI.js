@@ -1,71 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { default as api } from "visitorapi";
-import countryJson from "./countries.json";
+import { getCountryByCode, getStateByCodeAndCountry } from "../data/locationData";
 
 export const VisitorAPIContext = React.createContext();
 
-export const VisitorAPIComponents = ({projectId, handleCountryChange, handleStateChange, defaultCountryCode, defaultStateCode, children}) => {
-    const [countryObj, setCountryObj] = useState(null); // country object in the json file
-    const [stateObj, setStateObj] = useState(null); // state object in the json file
-    const countries = countryJson.countries;
+export const VisitorAPIComponents = ({
+    projectId,
+    handleCountryChange,
+    handleStateChange,
+    handleCityChange,
+    defaultCountryCode,
+    defaultStateCode,
+    defaultCityCode,
+    children,
+}) => {
+    const [countryObj, setCountryObjState] = useState(null);
+    const [stateObj, setStateObjState] = useState(null);
+    const [cityObj, setCityObjState] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Tracks whether the user has manually changed a field (via a <CountryField>/
+    // <StateField>/<CityField> onChange, which goes through the wrapped setters
+    // below), so a late-resolving geolocation response doesn't clobber it.
+    const userEditedRef = useRef({ country: false, state: false, city: false });
 
     useEffect(() => {
-        /**
-         * Get the country object that matches the country code
-         * @param {string} countryCode 
-         * @returns 
-         */
-        const getCountryObj = (countryCode) => {
-            const v = countries.find(obj =>{
-                return obj.code === countryCode
-            });
-            if(typeof(v) === 'undefined'){
-                return null
-            }else{
-                return v
-            }
-        }
-
-        /**
-         * Get the state object that matches the state code in the country object, if the country doesn't have a state list, return null
-         * @param {object} countryObj 
-         * @param {string} stateCode 
-         * @returns 
-         */
-        const getStateObj = (countryObj, stateCode) => {
-            if(countryObj.states){
-                const v = countryObj.states.find(obj => {
-                    return obj.code === stateCode.toUpperCase()
-                });
-                if(typeof(v) === 'undefined'){
-                    return null
-                }else{
-                    return v
+        if (defaultCountryCode) {
+            const c = getCountryByCode(defaultCountryCode);
+            setCountryObjState(c);
+            if (defaultStateCode) {
+                const s = getStateByCodeAndCountry(defaultStateCode, defaultCountryCode);
+                setStateObjState(s);
+                if (defaultCityCode) {
+                    const cities = s && s.cities ? s.cities : [];
+                    const matchedCity = cities.find((ct) => ct.code === defaultCityCode);
+                    setCityObjState(matchedCity || { code: defaultCityCode, label: defaultCityCode });
                 }
-            }else{
-                return {code: stateCode, label: stateCode}
             }
+            return;
         }
 
-        if(defaultCountryCode){
-            // use default values
-            const c = getCountryObj(defaultCountryCode)
-            setCountryObj(c);
-            if(defaultStateCode){
-                setStateObj(getStateObj(c, defaultStateCode));
-            }
-        }else{
-            if(typeof(projectId) !== 'undefined' && projectId.trim() !== ''){
-                api(projectId).then(data => {
-                    const c = getCountryObj(data.countryCode)
-                    setStateObj(getStateObj(c, data.region));
-                    setCountryObj(c);
-                }).catch(error => {
-                    // error, do nothing
-                })
-            }    
+        if (typeof projectId === 'undefined' || projectId.trim() === '') {
+            return;
         }
-    },[projectId, countries, defaultCountryCode, defaultStateCode]);
+
+        setLoading(true);
+        setError(null);
+        api(projectId)
+            .then((data) => {
+                if (userEditedRef.current.country) {
+                    return;
+                }
+                const c = getCountryByCode(data.countryCode);
+                setCountryObjState(c);
+
+                if (userEditedRef.current.state) {
+                    return;
+                }
+                const s = data.region
+                    ? getStateByCodeAndCountry(data.region, data.countryCode) || { code: data.region, label: data.region }
+                    : null;
+                setStateObjState(s);
+
+                if (userEditedRef.current.city) {
+                    return;
+                }
+                if (data.city) {
+                    setCityObjState({ code: data.city, label: data.city });
+                }
+            })
+            .catch((err) => {
+                setError(err);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [projectId, defaultCountryCode, defaultStateCode, defaultCityCode]);
 
     useEffect(() => {
         handleCountryChange(countryObj);
@@ -73,13 +84,37 @@ export const VisitorAPIComponents = ({projectId, handleCountryChange, handleStat
 
     useEffect(() => {
         handleStateChange(stateObj);
-    }, [stateObj, handleStateChange])
+    }, [stateObj, handleStateChange]);
+
+    useEffect(() => {
+        if (handleCityChange) {
+            handleCityChange(cityObj);
+        }
+    }, [cityObj, handleCityChange]);
+
+    const setCountryObj = useCallback((value) => {
+        userEditedRef.current.country = true;
+        setCountryObjState(value);
+    }, []);
+
+    const setStateObj = useCallback((value) => {
+        userEditedRef.current.state = true;
+        setStateObjState(value);
+    }, []);
+
+    const setCityObj = useCallback((value) => {
+        userEditedRef.current.city = true;
+        setCityObjState(value);
+    }, []);
 
     return (
         <VisitorAPIContext.Provider value={{
-            countryObj, setCountryObj, stateObj, setStateObj
+            countryObj, setCountryObj,
+            stateObj, setStateObj,
+            cityObj, setCityObj,
+            loading, error,
         }}>
             {children}
         </VisitorAPIContext.Provider>
     );
-}
+};
