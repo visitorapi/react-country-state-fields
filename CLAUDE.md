@@ -30,34 +30,59 @@ in package.json).
 ## Public API
 
 ```jsx
-import { CountryField, StateField, VisitorAPIComponents } from 'react-country-state-fields';
+import { CountryField, StateField, CityField, VisitorAPIComponents } from 'react-country-state-fields';
 
 <VisitorAPIComponents
   projectId="<visitorapi-project-id>"
   handleCountryChange={countryObj => …}
   handleStateChange={stateObj => …}
+  handleCityChange={cityObj => …}
 >
   <CountryField label="Country/Territory" />
   <StateField  label="State/Province" />
+  <CityField   label="City" />
 </VisitorAPIComponents>
 ```
 
 - `<VisitorAPIComponents>` is an invisible context provider that
-  calls the VisitorAPI service once and broadcasts country/state to
-  any nested field. Other arbitrary children render through.
-- `<CountryField>` and `<StateField>` are MUI-based selects. State
-  falls back to a free-text input for countries whose subdivisions
-  aren't enumerated.
-- Country object shape: `{ code: "US", label: "United States" }`.
-  State object shape: `{ code: "CA", label: "California" }`.
+  calls the VisitorAPI service once and broadcasts country/state/city
+  to any nested field. Also exposes `loading`/`error` on
+  `VisitorAPIContext`. Other arbitrary children render through.
+- `<CountryField>`, `<StateField>`, `<CityField>` are MUI-based
+  selects. State/city fall back to a free-text input where the
+  underlying data source has no subdivisions for that selection.
+- Country/state/city object shape: `{ code, label }`, e.g.
+  `{ code: "US", label: "United States" }`, `{ code: "CA", label: "California" }`.
+  City objects have no distinct ISO code in the dataset, so `code`
+  and `label` are both the city name.
+- Data source: the `country-state-city` npm package (not a
+  hand-maintained `countries.json` anymore) — 250 countries, 5,000+
+  states, 150,000+ cities. See `src/lib/data/locationData.js` for the
+  adapter that normalizes its `{isoCode, name}` shape into this
+  package's `{code, label}` shape.
+- Style customization: `<CountryField>`/`<StateField>`/`<CityField>`
+  accept `sx`, `className`, `variant`, `fullWidth`, `size`, passed
+  through to the underlying MUI components. `<CountryField>` also
+  accepts `showFlag` (default `true`) and `renderFlag` to
+  disable/replace the `flagcdn.com` flag icon.
 
 ## Stack
 
-- React 18, MUI 5 (`@mui/material` + emotion).
+- React 18, MUI 5 (`@mui/material` + emotion) — both **peer
+  dependencies**, not bundled. Kept in `devDependencies` for local
+  build/test/demo.
+- `country-state-city` — country/state/city data source (regular
+  dependency, not a peer; it's an internal implementation detail).
 - `visitorapi` (the sibling npm SDK) — used internally by
   `<VisitorAPIComponents>` to fetch IP location.
-- Build via Babel CLI (not webpack/rollup); `babel src/lib --out-dir dist`.
+- Build via Babel CLI (not webpack/rollup); `babel src/lib --out-dir dist`,
+  followed by a cleanup step that deletes any `*.test.js`/`testUtils.js`
+  that `--copy-files` would otherwise carry into `dist/` (Babel CLI's
+  `--ignore` skips compiling ignored files but `--copy-files` still
+  raw-copies them, so exclusion has to happen post-build).
 - Demo / dev runner uses Create React App (`react-scripts`).
+- Tests: Jest + `@testing-library/react` + `@testing-library/user-event`
+  (v14, needs the `userEvent.setup()` API — don't downgrade to v13).
 
 ## Commands
 
