@@ -16,6 +16,7 @@ function HeadlessFields() {
 
   const selectStyle = {
     display: 'block',
+    boxSizing: 'border-box',
     width: '100%',
     padding: '8px',
     marginBottom: '12px',
@@ -61,25 +62,12 @@ function HeadlessFields() {
         />
       )}
 
-      {city.options && city.options.length > 0 ? (
-        <select
-          style={selectStyle}
-          value={city.value?.code ?? ''}
-          onChange={(e) => city.onChange(e.target.value)}
-        >
-          <option value="">Select a city</option>
-          {city.options.map((c) => (
-            <option key={c.code} value={c.code}>{c.label}</option>
-          ))}
-        </select>
-      ) : (
-        <input
-          style={selectStyle}
-          placeholder="City"
-          value={city.value?.code ?? ''}
-          onChange={(e) => city.onChange(e.target.value)}
-        />
-      )}
+      <input
+        style={selectStyle}
+        placeholder="City"
+        value={city.value?.code ?? ''}
+        onChange={(e) => city.onChange(e.target.value)}
+      />
     </div>
   );
 }
