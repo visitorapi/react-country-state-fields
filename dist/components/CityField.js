@@ -4,42 +4,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _react = _interopRequireWildcard(require("react"));
+var _react = _interopRequireDefault(require("react"));
 var _material = require("@mui/material");
-var _locationData = require("../data/locationData");
-var _VisitorAPI = require("./VisitorAPI");
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+var _useCityField2 = require("../hooks/useCityField");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
-function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-/**
- * Resolves which city list this field should offer, mirroring <StateField>'s
- * cascade: prefer the selected state's cities; for countries with no states
- * at all (e.g. Singapore, Monaco), fall back to the country's own city list.
- */
-const resolveCities = (countryObj, stateObj) => {
-  if (stateObj && stateObj.cities) {
-    return stateObj.cities;
-  }
-  if (countryObj && !countryObj.states && countryObj.cities) {
-    return countryObj.cities;
-  }
-  return null;
-};
-
-// getOptionLabel must handle both option objects and the raw string the
-// user is currently typing (freeSolo mode passes the in-progress input
-// value through here too, not just committed options).
-const getOptionLabel = option => typeof option === 'string' ? option : option.label;
 const CityField = _ref => {
   let _ref$label = _ref.label,
     label = _ref$label === void 0 ? "" : _ref$label,
@@ -50,45 +24,24 @@ const CityField = _ref => {
     size = _ref.size,
     _ref$freeSolo = _ref.freeSolo,
     freeSolo = _ref$freeSolo === void 0 ? true : _ref$freeSolo,
-    citiesProp = _ref.cities;
-  const _useContext = (0, _react.useContext)(_VisitorAPI.VisitorAPIContext),
-    countryObj = _useContext.countryObj,
-    stateObj = _useContext.stateObj,
-    cityObj = _useContext.cityObj,
-    setCityObj = _useContext.setCityObj;
-  const _useState = (0, _react.useState)(null),
-    _useState2 = _slicedToArray(_useState, 2),
-    value = _useState2[0],
-    setValue = _useState2[1];
-  // An explicit `cities` prop (including an empty array, e.g. while a
-  // consumer's own list is loading) always wins over the auto-cascaded
-  // country-state-city list, this is the escape hatch for consumers
-  // whose valid cities don't match the bundled dataset (a specific
-  // service area, delivery zones, etc).
-  const cities = Array.isArray(citiesProp) ? citiesProp : resolveCities(countryObj, stateObj);
-  (0, _react.useEffect)(() => {
-    if (cities && cityObj && cityObj.code) {
-      // Case-insensitive: VisitorAPI's own geolocation data doesn't
-      // always match this dataset's city-name casing exactly (e.g.
-      // "sydney" vs the canonical "Sydney").
-      const v = (0, _locationData.findCityByName)(cities, cityObj.code);
-      setValue(v || (freeSolo ? cityObj : null));
-    } else if (cityObj && cityObj.code) {
-      setValue(cityObj);
-    } else {
-      setValue(null);
-    }
-  }, [cities, cityObj, freeSolo]);
-  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, cities && (cities.length > 0 || freeSolo) ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
+    cities = _ref.cities;
+  const _useCityField = (0, _useCityField2.useCityField)({
+      cities,
+      freeSolo
+    }),
+    value = _useCityField.value,
+    options = _useCityField.options,
+    _onChange = _useCityField.onChange;
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, options && options.length > 0 ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
     value: value,
-    options: cities,
+    options: options,
     autoHighlight: true,
     freeSolo: freeSolo,
     sx: sx,
     className: className,
     fullWidth: fullWidth,
     size: size,
-    getOptionLabel: getOptionLabel,
+    getOptionLabel: option => typeof option === 'string' ? option : option.label,
     isOptionEqualToValue: (option, val) => option.code === val.code,
     renderOption: (props, option) => /*#__PURE__*/_react.default.createElement(_material.Box, _extends({
       component: "li"
@@ -101,18 +54,7 @@ const CityField = _ref => {
       })
     })),
     onChange: (event, newValue) => {
-      if (typeof newValue === 'string') {
-        // freeSolo: user typed a value not in the list and committed it
-        // (Enter, or blur, per MUI's freeSolo behavior).
-        if (newValue.trim() !== '') {
-          setCityObj({
-            code: newValue,
-            label: newValue
-          });
-        }
-      } else if (newValue) {
-        setCityObj(newValue);
-      }
+      _onChange(newValue);
     }
   }) : /*#__PURE__*/_react.default.createElement(_material.TextField, {
     label: label,
@@ -126,10 +68,7 @@ const CityField = _ref => {
     },
     value: value === null ? "" : value.code,
     onChange: event => {
-      setCityObj({
-        code: event.target.value,
-        label: event.target.value
-      });
+      _onChange(event.target.value);
     }
   }));
 };

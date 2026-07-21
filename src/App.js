@@ -1,7 +1,88 @@
 import './App.css';
 import { CountryField, StateField, CityField, VisitorAPIComponents } from './lib';
+import { useCountryField, useStateField, useCityField } from './lib/headless';
 import { Container, Stack, Grid } from '@mui/material';
 import React, { useState } from 'react';
+
+// A completely custom, non-MUI UI built on the headless hooks, plain <select>
+// elements styled with inline CSS, no @mui/material import anywhere in this
+// component. Demonstrates the /headless entry point works end-to-end and
+// shares cascading state with the MUI fields above it via the same
+// <VisitorAPIComponents> provider.
+function HeadlessFields() {
+  const country = useCountryField();
+  const state = useStateField();
+  const city = useCityField();
+
+  const selectStyle = {
+    display: 'block',
+    width: '100%',
+    padding: '8px',
+    marginBottom: '12px',
+    fontFamily: 'sans-serif',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+  };
+
+  return (
+    <div style={{ border: '2px dashed #999', padding: '16px', borderRadius: '8px' }}>
+      <p style={{ fontFamily: 'sans-serif', fontWeight: 'bold', marginTop: 0 }}>
+        Headless (no MUI) — plain &lt;select&gt; driven by useCountryField/useStateField/useCityField
+      </p>
+
+      <select
+        style={selectStyle}
+        value={country.value?.code ?? ''}
+        onChange={(e) => country.onChange(e.target.value)}
+      >
+        <option value="">Select a country</option>
+        {country.options.map((c) => (
+          <option key={c.code} value={c.code}>{c.label}</option>
+        ))}
+      </select>
+
+      {state.options ? (
+        <select
+          style={selectStyle}
+          value={state.value?.code ?? ''}
+          onChange={(e) => state.onChange(e.target.value)}
+        >
+          <option value="">Select a state</option>
+          {state.options.map((s) => (
+            <option key={s.code} value={s.code}>{s.label}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          style={selectStyle}
+          placeholder="State"
+          value={state.value?.code ?? ''}
+          onChange={(e) => state.onChange(e.target.value)}
+        />
+      )}
+
+      {city.options && city.options.length > 0 ? (
+        <select
+          style={selectStyle}
+          value={city.value?.code ?? ''}
+          onChange={(e) => city.onChange(e.target.value)}
+        >
+          <option value="">Select a city</option>
+          {city.options.map((c) => (
+            <option key={c.code} value={c.code}>{c.label}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          style={selectStyle}
+          placeholder="City"
+          value={city.value?.code ?? ''}
+          onChange={(e) => city.onChange(e.target.value)}
+        />
+      )}
+    </div>
+  );
+}
 
 function App() {
   const [country, setCountry] = useState({});
@@ -32,6 +113,7 @@ function App() {
                   variant="filled"
                   fullWidth
                 ></CountryField>
+                <HeadlessFields />
               </VisitorAPIComponents>
             </Stack>
             <p></p>

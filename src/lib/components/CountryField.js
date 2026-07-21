@@ -1,9 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { Autocomplete, TextField, Box } from "@mui/material";
-import { getAllCountries, getCountryByCode } from "../data/locationData";
-import { VisitorAPIContext } from "./VisitorAPI";
-
-const countries = getAllCountries();
+import { useCountryField } from "../hooks/useCountryField";
 
 const defaultRenderFlag = (option) => (
     <img
@@ -25,22 +22,12 @@ const CountryField = ({
     showFlag = true,
     renderFlag,
 }) => {
-    const { countryObj, setCountryObj, setStateObj, setCityObj } = useContext(VisitorAPIContext);
-    const [value, setValue] = useState(null);
-
-    useEffect(() => {
-        if (countryObj && countryObj.code) {
-            const v = countries.find((obj) => obj.code === countryObj.code);
-            setValue(typeof v === 'undefined' ? null : v);
-        } else {
-            setValue(null);
-        }
-    }, [countryObj]);
+    const { value, options, onChange } = useCountryField();
 
     return (
         <Autocomplete
             value={value}
-            options={countries}
+            options={options}
             autoHighlight
             sx={sx}
             className={className}
@@ -66,13 +53,7 @@ const CountryField = ({
                 />
             )}
             onChange={(event, newValue) => {
-                if (newValue) {
-                    setCountryObj(getCountryByCode(newValue.code));
-                    setStateObj(null);
-                    if (setCityObj) {
-                        setCityObj(null);
-                    }
-                }
+                onChange(newValue);
             }}
         />
     );

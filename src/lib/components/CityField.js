@@ -1,27 +1,6 @@
-import React, { useContext, useState, useEffect } from "react";
+import React from "react";
 import { Autocomplete, TextField, Box } from "@mui/material";
-import { findCityByName } from "../data/locationData";
-import { VisitorAPIContext } from "./VisitorAPI";
-
-/**
- * Resolves which city list this field should offer, mirroring <StateField>'s
- * cascade: prefer the selected state's cities; for countries with no states
- * at all (e.g. Singapore, Monaco), fall back to the country's own city list.
- */
-const resolveCities = (countryObj, stateObj) => {
-    if (stateObj && stateObj.cities) {
-        return stateObj.cities;
-    }
-    if (countryObj && !countryObj.states && countryObj.cities) {
-        return countryObj.cities;
-    }
-    return null;
-};
-
-// getOptionLabel must handle both option objects and the raw string the
-// user is currently typing (freeSolo mode passes the in-progress input
-// value through here too, not just committed options).
-const getOptionLabel = (option) => (typeof option === 'string' ? option : option.label);
+import { useCityField } from "../hooks/useCityField";
 
 const CityField = ({
     label = "",
@@ -31,44 +10,23 @@ const CityField = ({
     fullWidth,
     size,
     freeSolo = true,
-    cities: citiesProp,
+    cities,
 }) => {
-    const { countryObj, stateObj, cityObj, setCityObj } = useContext(VisitorAPIContext);
-    const [value, setValue] = useState(null);
-    // An explicit `cities` prop (including an empty array, e.g. while a
-    // consumer's own list is loading) always wins over the auto-cascaded
-    // country-state-city list, this is the escape hatch for consumers
-    // whose valid cities don't match the bundled dataset (a specific
-    // service area, delivery zones, etc).
-    const cities = Array.isArray(citiesProp) ? citiesProp : resolveCities(countryObj, stateObj);
-
-    useEffect(() => {
-        if (cities && cityObj && cityObj.code) {
-            // Case-insensitive: VisitorAPI's own geolocation data doesn't
-            // always match this dataset's city-name casing exactly (e.g.
-            // "sydney" vs the canonical "Sydney").
-            const v = findCityByName(cities, cityObj.code);
-            setValue(v || (freeSolo ? cityObj : null));
-        } else if (cityObj && cityObj.code) {
-            setValue(cityObj);
-        } else {
-            setValue(null);
-        }
-    }, [cities, cityObj, freeSolo]);
+    const { value, options, onChange } = useCityField({ cities, freeSolo });
 
     return (
         <>
-            {(cities && (cities.length > 0 || freeSolo)) ? (
+            {(options && options.length > 0) ? (
                 <Autocomplete
                     value={value}
-                    options={cities}
+                    options={options}
                     autoHighlight
                     freeSolo={freeSolo}
                     sx={sx}
                     className={className}
                     fullWidth={fullWidth}
                     size={size}
-                    getOptionLabel={getOptionLabel}
+                    getOptionLabel={(option) => (typeof option === 'string' ? option : option.label)}
                     isOptionEqualToValue={(option, val) => option.code === val.code}
                     renderOption={(props, option) => (
                         <Box component="li" {...props}>
@@ -87,15 +45,7 @@ const CityField = ({
                         />
                     )}
                     onChange={(event, newValue) => {
-                        if (typeof newValue === 'string') {
-                            // freeSolo: user typed a value not in the list and committed it
-                            // (Enter, or blur, per MUI's freeSolo behavior).
-                            if (newValue.trim() !== '') {
-                                setCityObj({ code: newValue, label: newValue });
-                            }
-                        } else if (newValue) {
-                            setCityObj(newValue);
-                        }
+                        onChange(newValue);
                     }}
                 />
             ) : (
@@ -111,7 +61,7 @@ const CityField = ({
                     }}
                     value={(value === null) ? "" : value.code}
                     onChange={(event) => {
-                        setCityObj({ code: event.target.value, label: event.target.value });
+                        onChange(event.target.value);
                     }}
                 />
             )}

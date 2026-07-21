@@ -4,6 +4,8 @@ The country, state, and city fields are the most annoying fields to fill because
 
 The component package comes with `<CountryField>`, `<StateField>`, and `<CityField>` components. Country/state/city data is sourced from the [country-state-city](https://www.npmjs.com/package/country-state-city) package: 250 countries, 5,000+ states/provinces, and 150,000+ cities, so `<StateField>` and `<CityField>` cascade correctly for virtually every country, not just a handful. The components are built with Material-UI as shown in the screenshots below.
 
+Don't use MUI? All the cascading/auto-detect logic is also available as headless hooks with zero MUI dependency, see [Headless usage](#headless-usage-no-mui) below to build your own UI in whatever you're already using.
+
 ![`React country and state fields](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/react-country-state-fields.gif)
 
 ![`<CountryField>` and `<StateField>` components](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-and-state-field.png)
@@ -19,7 +21,7 @@ See here for the example repo: [https://github.com/visitorapi/react-country-stat
 npm i react-country-state-fields
 ```
 
-`react`, `react-dom`, and `@mui/material` (plus `@emotion/react`/`@emotion/styled`, MUI's peer requirements) are peer dependencies, not bundled dependencies. If your project doesn't already have them installed:
+`react` and `react-dom` are required peer dependencies. `@mui/material` (plus `@emotion/react`/`@emotion/styled`, MUI's own peer requirements) is an **optional** peer dependency, only needed if you use the pre-built `<CountryField>`/`<StateField>`/`<CityField>` components. If you're using the [headless hooks](#headless-usage-no-mui) to build your own UI, you don't need to install MUI at all.
 
 ```
 npm i react react-dom @mui/material @emotion/react @emotion/styled
@@ -149,3 +151,61 @@ City data is inherently less complete than country/state data, there's no ISO st
 // Require a selection from the list, no free typing
 <CityField label="City" freeSolo={false} />
 ```
+
+# Headless usage (no MUI)
+
+Everything the MUI components do, auto-detecting from the visitor's IP, cascading state from country, cascading city from state, guarding against clobbering a value the user is actively editing, is implemented as plain React hooks with no MUI/emotion import anywhere in the dependency chain. `<CountryField>`/`<StateField>`/`<CityField>` are thin wrappers around these hooks. If you're building your own UI (Tailwind, Chakra, plain HTML, a design system, whatever), import from the `/headless` subpath instead and skip the MUI peer dependency entirely.
+
+```jsx
+import { VisitorAPIComponents, useCountryField, useStateField, useCityField } from 'react-country-state-fields/headless';
+
+function MyCountrySelect() {
+  const { value, options, onChange } = useCountryField();
+  return (
+    <select value={value?.code ?? ''} onChange={(e) => onChange(e.target.value)}>
+      <option value="">Select a country</option>
+      {options.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
+    </select>
+  );
+}
+
+function MyForm() {
+  return (
+    <VisitorAPIComponents projectId="<visitorapi-project-id>">
+      <MyCountrySelect />
+    </VisitorAPIComponents>
+  );
+}
+```
+
+`<VisitorAPIComponents>` is exported from both the default entry point and `/headless`, it's the same context provider either way, so headless hooks and the pre-built MUI fields can share the same provider and stay in sync (mix and match freely).
+
+## `useCountryField()`
+
+Returns `{ value, options, onChange }`.
+
+- `value` - the currently selected country object (`{ code, label }`), or `null`.
+- `options` - the full list of country objects to render as choices.
+- `onChange(countryCodeOrObject)` - call with a country code string (e.g. from a `<select>`'s `event.target.value`) or a country object. Clears the selected state and city, matching the cascading behavior of `<CountryField>`.
+
+## `useStateField()`
+
+Returns `{ value, options, onChange }`.
+
+- `value` - the currently selected state object, or `null`.
+- `options` - the list of state objects for the current country, or `null` if the current country has no state-level data (render a free-text input in that case, same fallback `<StateField>` uses).
+- `onChange(stateCodeOrObject)` - call with a state code string or object. Clears the selected city.
+
+## `useCityField({ cities, freeSolo } = {})`
+
+Returns `{ value, options, freeSolo, onChange }`.
+
+- `value` - the currently selected/typed city object, or `null`.
+- `options` - the list of city objects cascaded from the current state (or country, where there's no state-level data), or `null`/empty if none are available (render a free-text input in that case).
+- `cities` - optional override: pass your own array of `{ code, label }` objects to replace the auto-cascaded list entirely, same as `<CityField>`'s `cities` prop.
+- `freeSolo` (default `true`) - whether `onChange` should accept a typed value that isn't in `options`.
+- `onChange(cityNameOrObject)` - call with a city name string or object.
+
+## `useVisitorLocationStatus()`
+
+Returns `{ loading, error }` — the same values exposed on `VisitorAPIContext`, for rendering a loading or error state around your custom fields.

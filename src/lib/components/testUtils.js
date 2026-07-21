@@ -21,3 +21,10 @@ export const makeContextValue = (overrides = {}) => ({
     error: null,
     ...overrides,
 });
+
+// For renderHook(fn, { wrapper: makeContextWrapper(contextValue) })
+export const makeContextWrapper = (contextValue) => ({ children }) => (
+    <VisitorAPIContext.Provider value={contextValue}>
+        {children}
+    </VisitorAPIContext.Provider>
+);

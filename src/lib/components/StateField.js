@@ -1,7 +1,6 @@
-import React, { useContext, useState, useEffect } from "react";
+import React from "react";
 import { Autocomplete, TextField, Box } from "@mui/material";
-import { getStateByCodeAndCountry } from "../data/locationData";
-import { VisitorAPIContext } from "./VisitorAPI";
+import { useStateField } from "../hooks/useStateField";
 
 const StateField = ({
     label = "",
@@ -11,26 +10,14 @@ const StateField = ({
     fullWidth,
     size,
 }) => {
-    const { countryObj, stateObj, setStateObj, setCityObj } = useContext(VisitorAPIContext);
-    const [value, setValue] = useState(null);
-
-    useEffect(() => {
-        if (countryObj && countryObj.states && stateObj && stateObj.code) {
-            const v = countryObj.states.find((obj) => obj.code === stateObj.code);
-            setValue(typeof v === 'undefined' ? null : v);
-        } else if (stateObj && stateObj.code) {
-            setValue(stateObj);
-        } else {
-            setValue(null);
-        }
-    }, [countryObj, stateObj]);
+    const { value, options, onChange } = useStateField();
 
     return (
         <>
-            {(countryObj && countryObj.states) ? (
+            {options ? (
                 <Autocomplete
                     value={value}
-                    options={countryObj.states}
+                    options={options}
                     autoHighlight
                     sx={sx}
                     className={className}
@@ -55,15 +42,7 @@ const StateField = ({
                         />
                     )}
                     onChange={(event, newValue) => {
-                        if (newValue) {
-                            const enriched = countryObj
-                                ? getStateByCodeAndCountry(newValue.code, countryObj.code)
-                                : newValue;
-                            setStateObj(enriched || newValue);
-                            if (setCityObj) {
-                                setCityObj(null);
-                            }
-                        }
+                        onChange(newValue);
                     }}
                 />
             ) : (
@@ -79,10 +58,7 @@ const StateField = ({
                     }}
                     value={(value === null) ? "" : value.code}
                     onChange={(event) => {
-                        setStateObj({ code: event.target.value, label: event.target.value });
-                        if (setCityObj) {
-                            setCityObj(null);
-                        }
+                        onChange(event.target.value);
                     }}
                 />
             )}

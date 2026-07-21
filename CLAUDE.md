@@ -14,8 +14,14 @@ up via the VisitorAPI service. Published to npm as
 
 ```
 .
-├── src/lib/              # the component source (built into dist/)
-├── dist/                 # built output — what npm publishes
+├── src/lib/
+│   ├── components/        # MUI-based field components (thin wrappers over hooks/)
+│   ├── hooks/              # headless logic: useCountryField, useStateField,
+│   │                       # useCityField, useVisitorLocationStatus — zero MUI import
+│   ├── data/               # country-state-city adapter
+│   ├── index.js            # default entry point: components + hooks
+│   └── headless.js         # MUI-free entry point: context provider + hooks only
+├── dist/                 # built output — what npm publishes (dist/index.js, dist/headless.js)
 ├── demo/                 # demo / example app
 ├── public/               # CRA public assets for the demo
 ├── assets/               # README screenshots
@@ -24,8 +30,35 @@ up via the VisitorAPI service. Published to npm as
 └── README.md
 ```
 
-The published artefact is `dist/index.js` (set as `main` and `module`
-in package.json).
+The published artefacts are `dist/index.js` (`main`/`module`) and
+`dist/headless.js`, wired up via the `exports` map in package.json
+(`.` → `dist/index.js`, `./headless` → `dist/headless.js`). Both
+compile automatically from the same `babel src/lib --out-dir dist`
+build since `headless.js` and `hooks/` live under `src/lib`.
+
+## Headless architecture
+
+All cascading/auto-detect/user-edit-guarding logic lives in
+`src/lib/hooks/` as plain hooks with no MUI or emotion import
+anywhere in their import graph (`useCountryField`, `useStateField`,
+`useCityField`, `useVisitorLocationStatus`). `<CountryField>`,
+`<StateField>`, `<CityField>` in `src/lib/components/` are thin MUI
+wrappers that call these hooks and render `Autocomplete`/`TextField`.
+
+Consumers who don't want MUI import from `react-country-state-fields/headless`
+instead of the package root — same `VisitorAPIComponents` provider,
+just the hooks without any pre-built UI. This is why `@mui/material`,
+`@emotion/react`, and `@emotion/styled` are `peerDependenciesMeta`
+`optional: true` in package.json — they're only required if you
+import the MUI components from the default entry point.
+
+When adding new field logic: put the stateful/cascading logic in a
+hook under `hooks/`, and keep the corresponding MUI component in
+`components/` as a thin render layer on top. Don't let MUI imports
+leak into `hooks/` or `headless.js` — that's what keeps the headless
+entry point genuinely MUI-free (verify with
+`grep -rn "@mui\|@emotion" src/lib/hooks src/lib/headless.js` after
+changes).
 
 ## Public API
 
@@ -76,6 +109,10 @@ import { CountryField, StateField, CityField, VisitorAPIComponents } from 'react
   `getOptionLabel` on that field must handle both option objects and
   raw strings (freeSolo passes the in-progress typed text through it
   too), don't remove the `typeof option === 'string'` check.
+- Headless hooks (`useCountryField`, `useStateField`, `useCityField`,
+  `useVisitorLocationStatus`) are exported both from the package root
+  and from `react-country-state-fields/headless` (MUI-free import) —
+  see "Headless architecture" below.
 
 ## Stack
 
