@@ -1,29 +1,32 @@
 import React from "react";
 import { Autocomplete, TextField, Box } from "@mui/material";
-import { useStateField } from "../hooks/useStateField";
+import { useCityField } from "../hooks/useCityField";
 
-const StateField = ({
+const CityField = ({
     label = "",
     sx,
     className,
     variant,
     fullWidth,
     size,
+    freeSolo = true,
+    cities,
 }) => {
-    const { value, options, onChange } = useStateField();
+    const { value, options, onChange } = useCityField({ cities, freeSolo });
 
     return (
         <>
-            {options ? (
+            {(options && options.length > 0) ? (
                 <Autocomplete
                     value={value}
                     options={options}
                     autoHighlight
+                    freeSolo={freeSolo}
                     sx={sx}
                     className={className}
                     fullWidth={fullWidth}
                     size={size}
-                    getOptionLabel={(option) => option.label}
+                    getOptionLabel={(option) => (typeof option === 'string' ? option : option.label)}
                     isOptionEqualToValue={(option, val) => option.code === val.code}
                     renderOption={(props, option) => (
                         <Box component="li" {...props}>
@@ -37,7 +40,7 @@ const StateField = ({
                             variant={variant}
                             inputProps={{
                                 ...params.inputProps,
-                                autoComplete: 'state',
+                                autoComplete: 'address-level2',
                             }}
                         />
                     )}
@@ -54,7 +57,7 @@ const StateField = ({
                     fullWidth={fullWidth}
                     size={size}
                     inputProps={{
-                        autoComplete: 'state',
+                        autoComplete: 'address-level2',
                     }}
                     value={(value === null) ? "" : value.code}
                     onChange={(event) => {
@@ -66,4 +69,4 @@ const StateField = ({
     );
 };
 
-export default StateField;
+export default CityField;

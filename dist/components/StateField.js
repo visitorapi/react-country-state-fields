@@ -1,82 +1,67 @@
 "use strict";
 
-require("core-js/modules/es.object.assign.js");
-require("core-js/modules/es.symbol.description.js");
-require("core-js/modules/es.weak-map.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/web.dom-collections.iterator.js");
-var _react = _interopRequireWildcard(require("react"));
+var _react = _interopRequireDefault(require("react"));
 var _material = require("@mui/material");
-var _VisitorAPI = require("./VisitorAPI");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+var _useStateField2 = require("../hooks/useStateField");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : String(i); }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 const StateField = _ref => {
-  let {
-    label = ""
-  } = _ref;
-  const {
-    countryObj,
-    stateObj,
-    setStateObj
-  } = (0, _react.useContext)(_VisitorAPI.VisitorAPIContext);
-  const [value, setValue] = (0, _react.useState)(null);
-  (0, _react.useEffect)(() => {
-    if (countryObj && countryObj.states && stateObj && stateObj.code) {
-      const v = countryObj.states.find(obj => {
-        return obj.code === stateObj.code;
-      });
-      if (typeof v === 'undefined') {
-        setValue(null);
-      } else {
-        setValue(v);
-      }
-    } else {
-      if (stateObj && stateObj.code) {
-        setValue(stateObj);
-      } else {
-        setValue(null);
-      }
-    }
-  }, [countryObj, stateObj]);
-  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, countryObj && countryObj.states ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
+  let _ref$label = _ref.label,
+    label = _ref$label === void 0 ? "" : _ref$label,
+    sx = _ref.sx,
+    className = _ref.className,
+    variant = _ref.variant,
+    fullWidth = _ref.fullWidth,
+    size = _ref.size;
+  const _useStateField = (0, _useStateField2.useStateField)(),
+    value = _useStateField.value,
+    options = _useStateField.options,
+    _onChange = _useStateField.onChange;
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, options ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
     value: value,
-    options: countryObj.states,
+    options: options,
     autoHighlight: true,
+    sx: sx,
+    className: className,
+    fullWidth: fullWidth,
+    size: size,
     getOptionLabel: option => option.label,
+    isOptionEqualToValue: (option, val) => option.code === val.code,
     renderOption: (props, option) => /*#__PURE__*/_react.default.createElement(_material.Box, _extends({
       component: "li"
     }, props), option.label),
     renderInput: params => /*#__PURE__*/_react.default.createElement(_material.TextField, _extends({}, params, {
       label: label,
+      variant: variant,
       inputProps: _objectSpread(_objectSpread({}, params.inputProps), {}, {
         autoComplete: 'state'
       })
     })),
     onChange: (event, newValue) => {
-      if (newValue) {
-        setStateObj(newValue);
-      }
+      _onChange(newValue);
     }
   }) : /*#__PURE__*/_react.default.createElement(_material.TextField, {
     label: label,
+    sx: sx,
+    className: className,
+    variant: variant,
+    fullWidth: fullWidth,
+    size: size,
     inputProps: {
       autoComplete: 'state'
     },
     value: value === null ? "" : value.code,
     onChange: event => {
-      setStateObj({
-        code: event.target.value,
-        label: event.target.value
-      });
+      _onChange(event.target.value);
     }
   }));
 };

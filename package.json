@@ -1,11 +1,15 @@
 {
   "name": "react-country-state-fields",
-  "version": "1.0.5",
+  "version": "1.2.0",
   "private": false,
   "author": "VisitorAPI",
   "description": "React country and state field components that can auto-detect user's IP geolocation to prefill.",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./headless": "./dist/headless.js"
+  },
   "files": [
     "dist",
     "README.md",
@@ -34,21 +38,26 @@
   "homepage": "https://www.visitorapi.com",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.15.3",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "country-state-city": "^3.2.1",
     "react-scripts": "5.0.1",
     "visitorapi": "^2.0.0",
     "web-vitals": "^2.1.4"
   },
+  "peerDependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@emotion/react": { "optional": true },
+    "@emotion/styled": { "optional": true },
+    "@mui/material": { "optional": true }
+  },
   "scripts": {
     "start": "react-scripts start",
-    "build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files",
+    "build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files && find dist -name '*.test.js' -delete && rm -f dist/components/testUtils.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -73,6 +82,14 @@
   "devDependencies": {
     "@babel/cli": "^7.23.4",
     "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.8"
+    "@babel/preset-env": "^7.23.8",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.3",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

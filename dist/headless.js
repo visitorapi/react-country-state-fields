@@ -3,24 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "CityField", {
-  enumerable: true,
-  get: function get() {
-    return _CityField.default;
-  }
-});
-Object.defineProperty(exports, "CountryField", {
-  enumerable: true,
-  get: function get() {
-    return _CountryField.default;
-  }
-});
-Object.defineProperty(exports, "StateField", {
-  enumerable: true,
-  get: function get() {
-    return _StateField.default;
-  }
-});
 Object.defineProperty(exports, "VisitorAPIComponents", {
   enumerable: true,
   get: function get() {
@@ -57,12 +39,8 @@ Object.defineProperty(exports, "useVisitorLocationStatus", {
     return _useVisitorLocationStatus.useVisitorLocationStatus;
   }
 });
-var _CountryField = _interopRequireDefault(require("./components/CountryField"));
-var _StateField = _interopRequireDefault(require("./components/StateField"));
-var _CityField = _interopRequireDefault(require("./components/CityField"));
 var _VisitorAPI = require("./components/VisitorAPI");
 var _useCountryField = require("./hooks/useCountryField");
 var _useStateField = require("./hooks/useStateField");
 var _useCityField = require("./hooks/useCityField");
 var _useVisitorLocationStatus = require("./hooks/useVisitorLocationStatus");
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
