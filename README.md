@@ -1,5 +1,10 @@
 # react-country-state-fields
 
+[![npm version](https://img.shields.io/npm/v/react-country-state-fields.svg)](https://www.npmjs.com/package/react-country-state-fields)
+[![npm downloads](https://img.shields.io/npm/dw/react-country-state-fields.svg)](https://www.npmjs.com/package/react-country-state-fields)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/react-country-state-fields)](https://bundlephobia.com/package/react-country-state-fields)
+[![license](https://img.shields.io/npm/l/react-country-state-fields.svg)](./LICENSE)
+
 The country, state, and city fields are the most annoying fields to fill because of the long list of options. The VisitorAPI React components are designed to smooth the user experience by prefilling the fields based on the user's IP location.
 
 The component package comes with `<CountryField>`, `<StateField>`, and `<CityField>` components. Country/state/city data is sourced from the [country-state-city](https://www.npmjs.com/package/country-state-city) package: 250 countries, 5,000+ states/provinces, and 150,000+ cities, so `<StateField>` and `<CityField>` cascade correctly for virtually every country, not just a handful. The components are built with Material-UI as shown in the screenshots below.
