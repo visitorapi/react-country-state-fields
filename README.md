@@ -11,7 +11,7 @@ The component package comes with `<CountryField>`, `<StateField>`, and `<CityFie
 
 Don't use MUI? All the cascading/auto-detect logic is also available as headless hooks with zero MUI dependency, see [Headless usage](#headless-usage-no-mui) below to build your own UI in whatever you're already using.
 
-![`React country and state fields](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/react-country-state-fields.gif)
+![React country, state, and city fields cascading and auto-filling, including the headless (no MUI) variant](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/react-country-state-fields.gif)
 
 ![`<CountryField>` and `<StateField>` components](https://raw.githubusercontent.com/visitorapi/react-country-state-fields/main//assets/country-field-and-state-field.png)
 
