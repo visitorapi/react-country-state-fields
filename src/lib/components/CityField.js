@@ -18,6 +18,11 @@ const resolveCities = (countryObj, stateObj) => {
     return null;
 };
 
+// getOptionLabel must handle both option objects and the raw string the
+// user is currently typing (freeSolo mode passes the in-progress input
+// value through here too, not just committed options).
+const getOptionLabel = (option) => (typeof option === 'string' ? option : option.label);
+
 const CityField = ({
     label = "",
     sx,
@@ -25,10 +30,17 @@ const CityField = ({
     variant,
     fullWidth,
     size,
+    freeSolo = true,
+    cities: citiesProp,
 }) => {
     const { countryObj, stateObj, cityObj, setCityObj } = useContext(VisitorAPIContext);
     const [value, setValue] = useState(null);
-    const cities = resolveCities(countryObj, stateObj);
+    // An explicit `cities` prop (including an empty array, e.g. while a
+    // consumer's own list is loading) always wins over the auto-cascaded
+    // country-state-city list, this is the escape hatch for consumers
+    // whose valid cities don't match the bundled dataset (a specific
+    // service area, delivery zones, etc).
+    const cities = Array.isArray(citiesProp) ? citiesProp : resolveCities(countryObj, stateObj);
 
     useEffect(() => {
         if (cities && cityObj && cityObj.code) {
@@ -36,26 +48,27 @@ const CityField = ({
             // always match this dataset's city-name casing exactly (e.g.
             // "sydney" vs the canonical "Sydney").
             const v = findCityByName(cities, cityObj.code);
-            setValue(v || null);
+            setValue(v || (freeSolo ? cityObj : null));
         } else if (cityObj && cityObj.code) {
             setValue(cityObj);
         } else {
             setValue(null);
         }
-    }, [cities, cityObj]);
+    }, [cities, cityObj, freeSolo]);
 
     return (
         <>
-            {(cities && cities.length > 0) ? (
+            {(cities && (cities.length > 0 || freeSolo)) ? (
                 <Autocomplete
                     value={value}
                     options={cities}
                     autoHighlight
+                    freeSolo={freeSolo}
                     sx={sx}
                     className={className}
                     fullWidth={fullWidth}
                     size={size}
-                    getOptionLabel={(option) => option.label}
+                    getOptionLabel={getOptionLabel}
                     isOptionEqualToValue={(option, val) => option.code === val.code}
                     renderOption={(props, option) => (
                         <Box component="li" {...props}>
@@ -74,7 +87,13 @@ const CityField = ({
                         />
                     )}
                     onChange={(event, newValue) => {
-                        if (newValue) {
+                        if (typeof newValue === 'string') {
+                            // freeSolo: user typed a value not in the list and committed it
+                            // (Enter, or blur, per MUI's freeSolo behavior).
+                            if (newValue.trim() !== '') {
+                                setCityObj({ code: newValue, label: newValue });
+                            }
+                        } else if (newValue) {
                             setCityObj(newValue);
                         }
                     }}

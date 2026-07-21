@@ -35,6 +35,11 @@ const resolveCities = (countryObj, stateObj) => {
   }
   return null;
 };
+
+// getOptionLabel must handle both option objects and the raw string the
+// user is currently typing (freeSolo mode passes the in-progress input
+// value through here too, not just committed options).
+const getOptionLabel = option => typeof option === 'string' ? option : option.label;
 const CityField = _ref => {
   let _ref$label = _ref.label,
     label = _ref$label === void 0 ? "" : _ref$label,
@@ -42,7 +47,10 @@ const CityField = _ref => {
     className = _ref.className,
     variant = _ref.variant,
     fullWidth = _ref.fullWidth,
-    size = _ref.size;
+    size = _ref.size,
+    _ref$freeSolo = _ref.freeSolo,
+    freeSolo = _ref$freeSolo === void 0 ? true : _ref$freeSolo,
+    citiesProp = _ref.cities;
   const _useContext = (0, _react.useContext)(_VisitorAPI.VisitorAPIContext),
     countryObj = _useContext.countryObj,
     stateObj = _useContext.stateObj,
@@ -52,29 +60,35 @@ const CityField = _ref => {
     _useState2 = _slicedToArray(_useState, 2),
     value = _useState2[0],
     setValue = _useState2[1];
-  const cities = resolveCities(countryObj, stateObj);
+  // An explicit `cities` prop (including an empty array, e.g. while a
+  // consumer's own list is loading) always wins over the auto-cascaded
+  // country-state-city list, this is the escape hatch for consumers
+  // whose valid cities don't match the bundled dataset (a specific
+  // service area, delivery zones, etc).
+  const cities = Array.isArray(citiesProp) ? citiesProp : resolveCities(countryObj, stateObj);
   (0, _react.useEffect)(() => {
     if (cities && cityObj && cityObj.code) {
       // Case-insensitive: VisitorAPI's own geolocation data doesn't
       // always match this dataset's city-name casing exactly (e.g.
       // "sydney" vs the canonical "Sydney").
       const v = (0, _locationData.findCityByName)(cities, cityObj.code);
-      setValue(v || null);
+      setValue(v || (freeSolo ? cityObj : null));
     } else if (cityObj && cityObj.code) {
       setValue(cityObj);
     } else {
       setValue(null);
     }
-  }, [cities, cityObj]);
-  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, cities && cities.length > 0 ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
+  }, [cities, cityObj, freeSolo]);
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, cities && (cities.length > 0 || freeSolo) ? /*#__PURE__*/_react.default.createElement(_material.Autocomplete, {
     value: value,
     options: cities,
     autoHighlight: true,
+    freeSolo: freeSolo,
     sx: sx,
     className: className,
     fullWidth: fullWidth,
     size: size,
-    getOptionLabel: option => option.label,
+    getOptionLabel: getOptionLabel,
     isOptionEqualToValue: (option, val) => option.code === val.code,
     renderOption: (props, option) => /*#__PURE__*/_react.default.createElement(_material.Box, _extends({
       component: "li"
@@ -87,7 +101,16 @@ const CityField = _ref => {
       })
     })),
     onChange: (event, newValue) => {
-      if (newValue) {
+      if (typeof newValue === 'string') {
+        // freeSolo: user typed a value not in the list and committed it
+        // (Enter, or blur, per MUI's freeSolo behavior).
+        if (newValue.trim() !== '') {
+          setCityObj({
+            code: newValue,
+            label: newValue
+          });
+        }
+      } else if (newValue) {
         setCityObj(newValue);
       }
     }

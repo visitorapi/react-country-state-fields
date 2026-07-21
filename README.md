@@ -127,7 +127,25 @@ The `<StateField>` component is a selection field for users to input their state
 
 The `<CityField>` component is a selection field for users to input their city, cascading from the currently selected state (or directly from the country, for the countries that have no state-level data). Falls back to an open text field where no city data is available for the current selection.
 
+City data is inherently less complete than country/state data, there's no ISO standard for cities the way there is for countries and states, and the bundled dataset (150,000+ cities) still won't cover every small town, neighborhood, or business-specific service area. Because of that, `<CityField>` defaults to `freeSolo`: users can always type a value that isn't in the list. If your valid cities are a specific, known set (a delivery zone, a set of branch locations, etc), pass your own list via the `cities` prop instead of relying on the bundled dataset at all.
+
 ## Props
 
 - `label` - the field label such as "City". Leave it blank if you have a separate component for the field's label.
 - `sx`, `className`, `variant`, `fullWidth`, `size` - same style passthrough as `<CountryField>`.
+- `freeSolo` (default `true`) - lets the user type and commit a city that isn't in the suggested list (still shows suggestions from the cascaded/custom city list as they type). Set to `false` to require selecting from the list only.
+- `cities` - an array of `{code, label}` objects that overrides the auto-cascaded country-state-city list entirely. Use this when your valid cities are a known, specific set rather than "any city in this state."
+
+```jsx
+// Restrict to a specific set of cities instead of the full bundled dataset
+<CityField
+  label="City"
+  cities={[
+    { code: "Downtown", label: "Downtown" },
+    { code: "Uptown", label: "Uptown" },
+  ]}
+/>
+
+// Require a selection from the list, no free typing
+<CityField label="City" freeSolo={false} />
+```

@@ -65,6 +65,17 @@ import { CountryField, StateField, CityField, VisitorAPIComponents } from 'react
   through to the underlying MUI components. `<CountryField>` also
   accepts `showFlag` (default `true`) and `renderFlag` to
   disable/replace the `flagcdn.com` flag icon.
+- `<CityField>` defaults to `freeSolo` (MUI Autocomplete prop): users
+  can type and commit a city that isn't in the suggested list, since
+  city data has no ISO standard and the bundled dataset is never
+  fully complete. Set `freeSolo={false}` to require a list selection.
+  It also accepts a `cities` prop (array of `{code, label}`) that
+  overrides the auto-cascaded country-state-city list entirely, for
+  consumers whose valid cities are a specific known set (service
+  area, branch locations) rather than "any city in this state."
+  `getOptionLabel` on that field must handle both option objects and
+  raw strings (freeSolo passes the in-progress typed text through it
+  too), don't remove the `typeof option === 'string'` check.
 
 ## Stack
 
